@@ -125,20 +125,17 @@ module SchedulesHelper
                           [l(:label_this_year), 'current_year']],
                           value)
   end
-  
+
   def entries_to_csv(entries)
-      ic = Iconv.new(l(:general_csv_encoding), 'UTF-8')    
       decimal_separator = l(:general_csv_decimal_separator)
-      export = StringIO.new
-      CSV::Writer.generate(export, l(:general_csv_separator)) do |csv|
+      export = FCSV.generate(:col_sep =>  l(:general_csv_separator)) do |csv|
           # csv header fields
           headers = [l(:field_date),
                      l(:field_user),
                      l(:field_project),
                      l(:field_hours),
                      ]
-          
-          csv << headers.collect {|c| begin; ic.iconv(c.to_s); rescue; c.to_s; end }
+          csv << headers.collect{|c| Redmine::CodesetUtil.from_utf8( c.to_s, l(:general_csv_encoding) )}
           # csv lines
           entries.each do |entry|
               fields = [format_date(entry.date),
@@ -146,11 +143,9 @@ module SchedulesHelper
                         entry.project,
                         entry.hours.to_s.gsub('.', decimal_separator),
                         ]
-                      
-            csv << fields.collect {|c| begin; ic.iconv(c.to_s); rescue; c.to_s; end }
+            csv << fields.collect{|c| Redmine::CodesetUtil.from_utf8( c.to_s, l(:general_csv_encoding) )}
           end
       end
-      export.rewind
       export
   end
   
@@ -159,8 +154,7 @@ module SchedulesHelper
   end
   
   def report_to_csv(criterias, periods, hours)
-      export = StringIO.new
-      CSV::Writer.generate(export, l(:general_csv_separator)) do |csv|
+      export = FCSV.generate(:col_sep => l(:general_csv_separator)) do |csv|
           # Column headers
           headers = criterias.collect {|criteria| l(@available_criterias[criteria][:label]) }
           headers += periods
@@ -179,7 +173,6 @@ module SchedulesHelper
           row << "%.2f" %total
           csv << row
       end
-      export.rewind
       export
   end
   
@@ -206,8 +199,9 @@ module SchedulesHelper
   end
   
   def to_utf8(s)
-      @ic ||= Iconv.new(l(:general_csv_encoding), 'UTF-8')
-      begin; @ic.iconv(s.to_s); rescue; s.to_s; end
+    #@ic ||= Iconv.new(l(:general_csv_encoding), 'UTF-8')
+    #begin; @ic.iconv(s.to_s); rescue; s.to_s; end
+    Redmine::CodesetUtil.to_utf8(s, l(:general_csv_encoding))
   end
   
   

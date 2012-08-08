@@ -10,6 +10,7 @@ ActionController::Routing::Routes.draw do |map|
     map.connect 'schedules/report', :action => 'report' 
     map.connect 'schedules/users', :action => 'users' 
     map.connect 'schedules/projects', :action => 'projects' 
+    map.connect 'schedules/details', :action => 'details'
 
     map.connect 'account/schedule/:user_id', :action => 'index'
     map.connect 'account/schedule/:user_id/edit', :action => 'edit'

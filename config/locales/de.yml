@@ -32,3 +32,4 @@ de:
   button_schedules_edit: "Zeitplan bearbeiten"
   button_schedules_fill: "Zeitplan füllen"
   button_schedules_default_edit: "Standardverfügbarkeit bearbeiten"
+  field_date: Datum

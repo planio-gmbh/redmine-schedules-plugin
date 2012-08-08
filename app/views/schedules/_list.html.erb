@@ -21,7 +21,7 @@
 <tr class="time-entry <%= cycle("odd", "even") %>">
 <td class="date"><%= format_date(entry.date) %></td>
 <td class="user"><%=h entry.user %></td>
-<td class="project"><%=h entry.project %></td>
+<td class="project"><%=h entry.project.name %></td>
 <td class="hours"><%= html_hours("%.2f" % entry.hours) %></td>
 <td align="center">
 <% if entry.editable_by?(User.current) && false -%>
