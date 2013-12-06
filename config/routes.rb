@@ -1,3 +1,6 @@
+# Should /schedules/details be added back, consider the following patches
+# * https://github.com/planio-gmbh/redmine-schedules-plugin/commit/d9fdc6f394c985cfdba0cf732026ba113707300c
+# * https://github.com/planio-gmbh/redmine-schedules-plugin/commit/6d277c86582d7a53d9bcdfa46324cb07521c6e53
 RedmineApp::Application.routes.draw do
   match 'schedules', :controller => 'schedules', :action => 'index'
   match 'schedules/users', :controller => 'schedules', :action => 'users'

@@ -18,6 +18,19 @@ class ScheduleEntry < ActiveRecord::Base
         "schedule_entry[#{user_id}][#{date}][#{project_id}]" 
     end
     
+  def event_datetime
+    date
+  end
+  def event_url(options = {})
+    options.merge :controller => 'schedules', :action => 'details', :project_id => project_id, :from => date.to_s, :to => date.to_s
+  end
+  def event_title
+    user.name
+  end
+  def event_description
+    "%.2f" % hours
+  end
+
     def <=>(other)
         if self.project != other.project
             self.project <=> other.project

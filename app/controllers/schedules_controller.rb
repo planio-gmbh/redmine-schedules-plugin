@@ -338,9 +338,15 @@ class SchedulesController < ApplicationController
 
     # Get schedule defaults for the specified users
     def get_defaults(user_ids = nil)
-        restrictions = "user_id IN ("+@users.collect {|user| user.id.to_s }.join(',')+")" unless @users.empty?
-        restrictions = "user_id IN ("+user_ids.join(',')+")" unless user_ids.nil?
+      if user_ids.blank?
+        user_ids = @users.collect {|user| user.id.to_s } if @users
+      end
+      if user_ids.blank?
+        return []
+      else
+        restrictions = "user_id IN ("+user_ids.join(',')+")"
         ScheduleDefault.find(:all, :conditions => restrictions)
+      end
     end
 
 
