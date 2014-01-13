@@ -1,1 +1,1 @@
-gem 'holidays', :github => 'alexdunae/holidays'
+gem 'holidays', '~> 1.0.3'
