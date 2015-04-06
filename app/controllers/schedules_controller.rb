@@ -30,6 +30,11 @@ class SchedulesController < ApplicationController
         Project.find(:all, :conditions => Project.allowed_to_condition(User.current, :view_schedules))
     end
 
+    # Return a list of the projects the user has permission to edit all schedules in
+    def self.edit_all_projects
+        Project.find(:all, :conditions => Project.allowed_to_condition(User.current, :edit_all_schedules))
+    end
+
 
     # Return a list of the users in the given projects which have permission to view schedules
     def self.visible_users(members)

@@ -20,5 +20,6 @@ Redmine::Plugin.register :redmine_schedules do
     end
 
     menu :top_menu, :schedules, { :controller => 'schedules', :action => 'my_index', :project_id => nil, :user_id => nil }, :after => :my_page, :caption => :label_schedules_my_index, :if => Proc.new { SchedulesController.visible_projects.size > 0 }
+    menu :top_menu, :all_schedules, { :controller => 'schedules', :action => 'index', :project_id => nil, :user_id => nil }, :after => :projects, :caption => :label_global_schedule, :if => Proc.new { SchedulesController.edit_all_projects.size > 0 }
     menu :project_menu, :schedules, { :controller => 'schedules', :action => 'index' }, :caption => :label_schedules_index, :after => :activity, :param => :project_id
 end
