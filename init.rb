@@ -1,17 +1,17 @@
 require 'redmine'
 require 'holidays'
-require 'holidays/fr'       # Edit this to the most appropriate holiday region for you: http://code.dunae.ca/svn/holidays/trunk/data/
-$holiday_locale = 'fr'   # Set this to the same region (or subregion if appropriate)
+require 'holidays/pl'       # Edit this to the most appropriate holiday region for you: http://code.dunae.ca/svn/holidays/trunk/data/
+$holiday_locale = 'pl'   # Set this to the same region (or subregion if appropriate)
 
 require_dependency 'schedule_compatibility'
 
 Redmine::Plugin.register :redmine_schedules do
     name 'Redmine Schedules plugin'
     author 'Brad Beattie'
-    description 'This plugin provides instances of Redmine a method with which to allocate users to projects and to track this allocation over time. It does so by creating daily time estimates of hours worked per project per user.'
-    url 'https://github.com/bradbeattie/redmine-schedules-plugin'
-    version '0.5.0'
-    requires_redmine :version_or_higher => '2.1.0'
+    description 'This plugin provides instances of Redmine a method with which to allocate users to projects and to track this allocation over time. It does so by creating daily time estimates of hours worked per project per user. Original repository is under this link "https://github.com/bradbeattie/redmine-schedules-plugin"'
+    url 'https://github.com/Yoru94/redmine3.1-schedules-plugin'
+    version '0.6.0'
+    requires_redmine :version_or_higher => '3.1.0'
 
     project_module :schedule_module do
         permission :view_schedules,  {:schedules => [:index]}, :require => :member
