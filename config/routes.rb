@@ -1,13 +1,13 @@
 RedmineApp::Application.routes.draw do
-  match 'schedules', :controller => 'schedules', :action => 'index'
-  match 'schedules/users', :controller => 'schedules', :action => 'users'
-  match 'schedules/projects', :controller => 'schedules', :action => 'projects'
-  match 'my/schedule', :controller => 'schedules', :action => 'my_index'
-  match 'account/schedule/:user_id', :controller => 'schedules', :action => 'index'
-  match 'account/schedule/:user_id/default', :controller => 'schedules', :action => 'default'
-  match 'account/schedule/:user_id/edit', :controller => 'schedules', :action => 'edit'
-  match 'projects/:project_id/schedules', :controller => 'schedules', :action => 'index'
-  match 'projects/:project_id/schedules/details', :controller => 'schedules', :action => 'details'
-  match 'projects/:project_id/schedules/edit', :controller => 'schedules', :action => 'edit'
-  match 'projects/:project_id/schedules/fill', :controller => 'schedules', :action => 'fill'
+  match 'schedules' 					,:to => 'schedules#index',		 	via: [:get, :post]
+  match 'schedules/users'				,:to => 'schedules#users', 		 	via: [:get, :post]
+  match 'schedules/projects' 				,:to => 'schedules#projects', 			via: [:get, :post]
+  match 'my/schedule' 					,:to => 'schedules#my_index', 			via: [:get, :post]
+  match 'account/schedule/:user_id'	 		,:to => 'schedules#index',		 	via: [:get, :post]
+  match 'account/schedule/:user_id/default'	 	,:to => 'schedules#default', 		 	via: [:get, :post]
+  match 'account/schedule/:user_id/edit' 		,:to => 'schedules#edit', 		 	via: [:get, :post]
+  match 'projects/:project_id/schedules' 		,:to => 'schedules#index', 			via: [:get, :post]
+  match 'projects/:project_id/schedules/details'	,:to => 'schedules#details',			via: [:get, :post]
+  match 'projects/:project_id/schedules/edit' 		,:to => 'schedules#edit', 			via: [:get, :post]
+  match 'projects/:project_id/schedules/fill' 		,:to => 'schedules#fill', 			via: [:get, :post]
 end
