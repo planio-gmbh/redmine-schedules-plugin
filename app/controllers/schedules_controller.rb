@@ -8,11 +8,11 @@ class SchedulesController < ApplicationController
 
 
     # Filters
-    before_filter :require_login
-    before_filter :find_users_and_projects, :only => [:index, :edit, :users, :projects, :fill]
-    before_filter :save_entries, :only => [:edit]
-    before_filter :save_default, :only => [:default]
-    before_filter :fill_entries, :only => [:fill]
+    before_action :require_login
+    before_action :find_users_and_projects, :only => [:index, :edit, :users, :projects, :fill]
+    before_action :save_entries, :only => [:edit]
+    before_action :save_default, :only => [:default]
+    before_action :fill_entries, :only => [:fill]
 
     # Included helpers
     include SchedulesHelper
@@ -27,12 +27,17 @@ class SchedulesController < ApplicationController
 
     # Return a list of the projects the user has permission to view schedules in
     def self.visible_projects
-        Project.find(:all, :conditions => Project.allowed_to_condition(User.current, :view_schedules))
+        Project.where(Project.allowed_to_condition(User.current, :view_schedules))
+	#marked 1
+	#Project.find(:all,:conditions => Project.allowed_to_condition(User.current, :view_schedules))
     end
+
 
     # Return a list of the projects the user has permission to edit all schedules in
     def self.edit_all_projects
-        Project.find(:all, :conditions => Project.allowed_to_condition(User.current, :edit_all_schedules))
+        Project.where(Project.allowed_to_condition(User.current, :edit_all_schedules))
+	#marked 2
+        #Project.find(:all,:conditions => Project.allowed_to_condition(User.current, :edit_all_schedules))
     end
 
 
@@ -81,6 +86,7 @@ class SchedulesController < ApplicationController
 
     # Edit the current user's default availability
     def default
+	#@schedule_default = ScheduleDefault.where(@user.id)
         @schedule_default = ScheduleDefault.find_by_user_id(@user)
         @schedule_default ||= ScheduleDefault.new
         @schedule_default.weekday_hours ||= [0,0,0,0,0,0,0]
@@ -143,9 +149,11 @@ class SchedulesController < ApplicationController
 
         # Get the users and projects involved in this save
         user_ids = params[:schedule_entry].collect { |user_id, dates_projects_hours| user_id }
-        users = User.find(:all, :conditions => "id IN ("+user_ids.join(',')+")").index_by { |user| user.id }
+	users = User.where("id IN ("+user_ids.join(',')+")").index_by { |user| user.id }
+        #users = User.find(:all, :conditions => "id IN ("+user_ids.join(',')+")").index_by { |user| user.id }
         project_ids = params[:schedule_entry].values.first.values.first.keys
-        projects = Project.find(:all, :conditions => "id IN ("+project_ids.join(',')+")").index_by { |project| project.id }
+        projects = Project.where("id IN ("+project_ids.join(',')+")").index_by { |project| project.id }
+	#projects = Project.find(:all, :conditions => "id IN ("+project_ids.join(',')+")").index_by { |project| project.id }
         defaults = get_defaults(user_ids).index_by { |default| default.user_id }
 
         # Take a look at a user and their default schedule
@@ -161,7 +169,8 @@ class SchedulesController < ApplicationController
                 other_projects = " AND project_id NOT IN (#{projects_hours.collect {|ph| ph[0] }.join(',')})"
                 available_hours = default.weekday_hours[date.wday]
                 available_hours -= ScheduleEntry.sum(:hours, :conditions => restrictions + other_projects) if available_hours > 0
-                closedEntry = ScheduleClosedEntry.find(:first, :conditions => restrictions) if available_hours > 0
+                closedEntry = ScheduleClosedEntry.where(restrictions).first if available_hours > 0
+		#closedEntry = ScheduleClosedEntry.find(:first, :conditions => restrictions) if available_hours > 0
                 available_hours -= closedEntry.hours unless closedEntry.nil?
 
                 # Look through the entries for each project, assuming access
@@ -171,7 +180,8 @@ class SchedulesController < ApplicationController
                     if User.current.allowed_to?(:edit_all_schedules, project) || (User.current == user && User.current.allowed_to?(:edit_own_schedules, project)) || User.current.admin?
 
                         # Find the old schedule entry and create a new one
-                        old_entry = ScheduleEntry.find(:first, :conditions => {:project_id => project_id, :user_id => user_id, :date => date})
+			old_entry = ScheduleEntry.where({:project_id => project_id, :user_id => user_id, :date => date}).first
+                        #old_entry = ScheduleEntry.find(:first, :conditions => {:project_id => project_id, :user_id => user_id, :date => date})
                         new_entry = ScheduleEntry.new
                         new_entry.project_id = project.id
                         new_entry.user_id = user.id
@@ -216,14 +226,16 @@ class SchedulesController < ApplicationController
 
         # Get the users and projects involved in this save
         user_ids = params[:schedule_closed_entry].collect { |user_id, dates| user_id }
-        users = User.find(:all, :conditions => "id IN ("+user_ids.join(',')+")").index_by { |user| user.id }
+	users = User.where("id IN ("+user_ids.join(',')+")").index_by { |user| user.id }
+        #users = User.find(:all, :conditions => "id IN ("+user_ids.join(',')+")").index_by { |user| user.id }
 
         # Save the user/day/hours triplet assuming sufficient access
         params[:schedule_closed_entry].each do |user_id, dates|
             user = users[user_id.to_i]
             if (User.current == user) || User.current.admin?
                 dates.each do |date, hours|
-                    old_entry = ScheduleClosedEntry.find(:first, :conditions => {:user_id => user_id, :date => date})
+                    old_entry = ScheduleClosedEntry.where({:user_id => user_id, :date => date}).first
+		    #old_entry = ScheduleClosedEntry.find(:first, :conditions => {:user_id => user_id, :date => date})
                     new_entry = ScheduleClosedEntry.new
                     new_entry.user_id = user.id
                     new_entry.date = date
@@ -242,7 +254,8 @@ class SchedulesController < ApplicationController
         if request.post? && params[:commit]
 
             # Determine the user's current availability default
-            @schedule_default = ScheduleDefault.find_by_user_id(@user.id)
+            #@schedule_default = ScheduleDefault.where(@user.id)
+	    @schedule_default = ScheduleDefault.find_by_user_id(@user.id)
             @schedule_default ||= ScheduleDefault.new
             @schedule_default.weekday_hours ||= [0,0,0,0,0,0,0]
             @schedule_default.user_id = @user.id
@@ -282,7 +295,8 @@ class SchedulesController < ApplicationController
 
                         # Find entries for this day
                         restrictions = "date = '#{date_index}' AND user_id = #{user_id}"
-                        project_entry = ScheduleEntry.find(:first, :conditions => restrictions + " AND project_id = #{@project.id}")
+                        project_entry = ScheduleEntry.where(restrictions + " AND project_id = #{@project.id}").first
+			#project_entry = ScheduleEntry.find(:first, :conditions => restrictions + " AND project_id = #{@project.id}")
                         other_project_hours = ScheduleEntry.sum(:hours, :conditions => restrictions + " AND project_id <> #{@project.id}")
                         closed_hours = ScheduleClosedEntry.sum(:hours, :conditions => restrictions)
 
@@ -329,7 +343,8 @@ class SchedulesController < ApplicationController
         elsif ignore_project
             restrictions << " AND project_id <> #{@project.id}"
         end
-        ScheduleEntry.find(:all, :conditions => restrictions)
+        ScheduleEntry.where(restrictions).all
+	#ScheduleEntry.find(:all, :conditions => restrictions)
     end
 
 
@@ -337,7 +352,8 @@ class SchedulesController < ApplicationController
     def get_closed_entries(startdt = @calendar.startdt, enddt = @calendar.enddt)
         restrictions = "(date BETWEEN '#{startdt}' AND '#{enddt}')"
         restrictions << " AND user_id IN ("+@users.collect {|user| user.id.to_s }.join(',')+")" unless @users.empty?
-        ScheduleClosedEntry.find(:all, :conditions => restrictions)
+        ScheduleClosedEntry.where(restrictions).all
+	#ScheduleClosedEntry.find(:all, :conditions => restrictions)
     end
 
 
@@ -345,7 +361,8 @@ class SchedulesController < ApplicationController
     def get_defaults(user_ids = nil)
         restrictions = "user_id IN ("+@users.collect {|user| user.id.to_s }.join(',')+")" unless @users.empty?
         restrictions = "user_id IN ("+user_ids.join(',')+")" unless user_ids.nil?
-        ScheduleDefault.find(:all, :conditions => restrictions)
+        ScheduleDefault.where(restrictions).all
+	#ScheduleDefault.find(:all, :conditions => restrictions)
     end
 
 
@@ -384,14 +401,16 @@ class SchedulesController < ApplicationController
         params[:user_id] = User.current.id if params[:user_id].nil?
         deny_access unless User.current.id == params[:user_id].to_i || User.current.admin?
         @user = User.find(params[:user_id])
+	#@user = User.find(params[:user_id])
     rescue ActiveRecord::RecordNotFound
         render_404
     end
 
     # Find the project associated with the given version
     def find_project_by_version
-        @version = Version.find(params[:id])
-        @project = @version.project
+	@version = Version.find(params[:id])
+        #@version = Version.find(params[:id])
+        @project = @version.project.id
         deny_access unless User.current.allowed_to?(:edit_all_schedules, @project) && User.current.allowed_to?(:manage_versions, @project)
     rescue ActiveRecord::RecordNotFound
         render_404
@@ -403,6 +422,8 @@ class SchedulesController < ApplicationController
         # Parse the focused user and/or project
         @project = Project.find(params[:project_id]) if params[:project_id]
         @user = User.find(params[:user_id]) if params[:user_id]
+	#@project = Project.find(params[:project_id]) if params[:project_id]
+        #@user = User.find(params[:user_id]) if params[:user_id]
         @focus = "users" if @project.nil? && @user.nil?
         @projects = visible_projects.sort
         @projects = @projects & @user.projects unless @user.nil?
