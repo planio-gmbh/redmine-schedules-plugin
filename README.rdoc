@@ -16,6 +16,7 @@ Secondary developer: JulienVdG
 == Installation
 
 Add this repository to your #{RAILS_ROOT}/plugins/redmine_schedules
+
 Or just do "git clone https://github.com/Yoru94/redmine3.1-schedules-plugin.git redmine_schedules"
 
 In #{RAILS_ROOT} run the command
