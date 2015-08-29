@@ -7,7 +7,7 @@ require_dependency 'schedule_compatibility'
 
 Redmine::Plugin.register :redmine_schedules do
     name 'Redmine Schedules plugin'
-    author 'Brad Beattie
+    author 'Brad Beattie'
     description 'This plugin provides instances of Redmine a method with which to allocate users to projects and to track this allocation over time. It does so by creating daily time estimates of hours worked per project per user.'
     url 'https://github.com/bradbeattie/redmine-schedules-plugin'
     version '0.6.0'
