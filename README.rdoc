@@ -23,3 +23,4 @@ In #{RAILS_ROOT} run the command
 
     bundle install
     rake redmine:plugins:migrate
+    rake redmine:plugins:migrate RAILS_ENV=production
