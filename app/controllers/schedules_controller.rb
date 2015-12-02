@@ -168,7 +168,7 @@ class SchedulesController < ApplicationController
                 restrictions = "date = '#{date}' AND user_id = #{user.id}"
                 other_projects = " AND project_id NOT IN (#{projects_hours.collect {|ph| ph[0] }.join(',')})"
                 available_hours = default.weekday_hours[date.wday]
-                available_hours -= ScheduleEntry.sum(:hours, :conditions => restrictions + other_projects) if available_hours > 0
+                available_hours -= ScheduleEntry.where(restrictions + other_projects).sum(:hours) if available_hours > 0
                 closedEntry = ScheduleClosedEntry.where(restrictions).first if available_hours > 0
 		#closedEntry = ScheduleClosedEntry.find(:first, :conditions => restrictions) if available_hours > 0
                 available_hours -= closedEntry.hours unless closedEntry.nil?
@@ -297,8 +297,8 @@ class SchedulesController < ApplicationController
                         restrictions = "date = '#{date_index}' AND user_id = #{user_id}"
                         project_entry = ScheduleEntry.where(restrictions + " AND project_id = #{@project.id}").first
 			#project_entry = ScheduleEntry.find(:first, :conditions => restrictions + " AND project_id = #{@project.id}")
-                        other_project_hours = ScheduleEntry.sum(:hours, :conditions => restrictions + " AND project_id <> #{@project.id}")
-                        closed_hours = ScheduleClosedEntry.sum(:hours, :conditions => restrictions)
+                        other_project_hours = ScheduleEntry.where(restrictions + " AND project_id <> #{@project.id}").sum(:hours)
+                        closed_hours = ScheduleClosedEntry.where(restrictions).sum(:hours)
 
                         # Determine the number of hours available
                         available_hours = default[date_index.wday]
