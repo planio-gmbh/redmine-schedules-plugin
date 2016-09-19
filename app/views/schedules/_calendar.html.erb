@@ -39,7 +39,7 @@
                         <%= link_to @user, :controller => 'schedules', :action => 'index', :date => @date, :user_id => @user unless @user.nil? %>
                     </th>
                     <% (calendar.startdt..calendar.enddt).each do |day| %>
-                        <td class="even<%= ' today' if Date.today == day %> <%= ' holiday' if day.holiday?($holiday_locale, :observed) %>">
+                        <td class="even<%= ' today' if Date.today == day %> <%= ' holiday' if Holidays.on(day, $holiday_locale, :observed).any? %>">
                             <ul>
                                 <% if !schedule_entries_by_day.nil? && !schedule_entries_by_day[day].nil? %>
                                     <% schedule_entries_by_day[day].sort.each do |entry| %>
@@ -61,7 +61,7 @@
             <% schedule_entries_by_day = @entries.group_by {|entry| entry.date} %>
             <tr>
                 <% (calendar.startdt..calendar.enddt).each do |day| %>
-                        <td class="even<%= ' today' if Date.today == day %> <%= ' holiday' if day.holiday?($holiday_locale, :observed) %>">
+                        <td class="even<%= ' today' if Date.today == day %> <%= ' holiday' if Holidays.on(day, $holiday_locale, :observed).any? %>">
                         <ul>
                             <% if !schedule_entries_by_day[day].nil? %>
                                 <% schedule_entries_by_day[day].sort.each do |entry| %>

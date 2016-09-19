@@ -306,7 +306,7 @@ class SchedulesController < ApplicationController
                         available_hours -= other_project_hours
                         available_hours -= project_entry.hours unless project_entry.nil?
                         available_hours = [available_hours, fill_hours, hours_remaining].min
-                        available_hours = 0 if date_index.holiday?($holiday_locale, :observed)
+                        available_hours = 0 if Holidays.on(date_index, $holiday_locale, :observed).any?
 
                         # Create an entry if we're adding time to this day
                         if available_hours > 0
@@ -390,7 +390,7 @@ class SchedulesController < ApplicationController
                 availabilities[day][user.id] -= entries_by_user[user.id][day].collect {|entry| entry.hours }.sum unless entries_by_user[user.id].nil? || entries_by_user[user.id][day].nil?
                 availabilities[day][user.id] -= closed_entries_by_user[user.id][day].hours unless closed_entries_by_user[user.id].nil? || closed_entries_by_user[user.id][day].nil?
                 availabilities[day][user.id] = [0, availabilities[day][user.id]].max
-                availabilities[day][user.id] = 0 if day.holiday?($holiday_locale, :observed)
+                availabilities[day][user.id] = 0 if Holidays.on(day, $holiday_locale, :observed).any?
             end
         end
         availabilities
